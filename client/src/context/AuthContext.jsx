@@ -15,7 +15,16 @@ export const AuthProvider = ({ children }) => {
     if (!token) { setLoading(false); return; }
     getMe()
       .then((profile) => { setUser(profile); })
-      .catch(() => { logout(); })
+      .catch((err) => {
+        // Only force-logout on explicit server rejection (401 Unauthorized).
+        // Network errors (server down, offline) should NOT clear the session
+        // so the user can still access cached data.
+        const status = err?.response?.status ?? err?.status;
+        if (status === 401) {
+          logout();
+        }
+        // else: keep token+user intact, app continues with cached data
+      })
       .finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

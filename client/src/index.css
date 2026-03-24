@@ -328,6 +328,17 @@ a:hover { color: var(--accent); }
   .form-grid { grid-template-columns: 1fr; }
 }
 
+.tx-form-row {
+  display: flex;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .tx-form-row {
+    flex-direction: column;
+  }
+}
+
 /* ── Badges / Pills ─────────────────────────────────────────────────────────── */
 .badge {
   display: inline-flex;
@@ -442,9 +453,13 @@ a:hover { color: var(--accent); }
 
 .loading-overlay {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 16px;
   min-height: 200px;
+  color: var(--text-2);
+  font-weight: 500;
 }
 
 /* ── Sync indicator ─────────────────────────────────────────────────────────── */

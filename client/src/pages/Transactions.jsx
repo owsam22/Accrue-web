@@ -59,7 +59,7 @@ const Transactions = () => {
   };
 
   if (isLoading && !transactions.length) {
-    return <Layout><div className="loading-overlay"><div className="spinner" /></div></Layout>;
+    return <Layout><div className="loading-overlay"><div className="spinner" /><p>Connecting to server...</p></div></Layout>;
   }
 
   return (
@@ -81,8 +81,8 @@ const Transactions = () => {
           <input className="form-input" style={{ paddingLeft: 36 }} placeholder="Search transactions…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         {['', 'income', 'expense', 'transfer'].map((t) => (
-          <button key={t} className={`btn btn-sm ${typeFilter === t ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTypeFilter(t)}>
-            {t || 'All'}
+          <button key={t} className={`btn btn-sm ${typeFilter === t ? 'btn-primary' : 'btn-secondary'}`} style={{ textTransform: 'capitalize' }} onClick={() => setTypeFilter(t)}>
+            {t === '' ? 'All' : t === 'transfer' ? 'Self transfer' : t}
           </button>
         ))}
       </div>
@@ -104,7 +104,9 @@ const Transactions = () => {
                 <div className="tx-info">
                   <p className="tx-title">{tx.note || tx.category}</p>
                   <p className="tx-meta">
-                    <span className="badge" style={{ background: typeColor[tx.type] + '22', color: typeColor[tx.type], marginRight: 6 }}>{tx.type}</span>
+                    <span className="badge" style={{ background: typeColor[tx.type] + '22', color: typeColor[tx.type], marginRight: 6, textTransform: 'capitalize' }}>
+                      {tx.type === 'transfer' ? 'self transfer' : tx.type}
+                    </span>
                     {tx.accountId?.name} · {fmtDate(tx.date)}
                   </p>
                 </div>
@@ -129,7 +131,7 @@ const Transactions = () => {
                 className={`btn btn-sm ${form.type === t ? 'btn-primary' : 'btn-secondary'}`}
                 style={{ flex: 1, textTransform: 'capitalize' }}
                 onClick={() => setForm({ ...form, type: t })}
-              >{t}</button>
+              >{t === 'transfer' ? 'Self transfer' : t}</button>
             ))}
           </div>
 
