@@ -7,6 +7,8 @@ import BackButton from '../components/BackButton';
 import { useAuth } from '../context/AuthContext';
 import Switch from '../components/toggele';
 import { updateProfile } from '../api/auth';
+import { getDashboard } from '../api/dashboard';
+import { RefreshCw } from 'lucide-react';
 
 const Settings = () => {
   const { user, logout, updateUser } = useAuth();
@@ -44,6 +46,18 @@ const Settings = () => {
       alert('Failed to update profile. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [syncing, setSyncing] = useState(false);
+  const handleSyncData = async () => {
+    setSyncing(true);
+    try {
+      await getDashboard();
+    } catch (err) {
+      console.error('Sync failed:', err);
+    } finally {
+      setSyncing(false);
     }
   };
 
@@ -127,6 +141,23 @@ const Settings = () => {
                 <p className="preference-desc">Switch between light and dark themes</p>
               </div>
               <Switch checked={isDark} onChange={handleThemeChange} />
+            </div>
+
+            <div className="divider" />
+
+            <div className="preference-item">
+              <div className="preference-info">
+                <p className="preference-title">Refresh Dashboard</p>
+                <p className="preference-desc">Manually sync dashboard data with server</p>
+              </div>
+              <button 
+                className="btn btn-secondary btn-sm" 
+                onClick={handleSyncData} 
+                disabled={syncing}
+              >
+                <RefreshCw size={14} className={syncing ? 'spin-once' : ''} />
+                {syncing ? 'Syncing...' : 'Refresh'}
+              </button>
             </div>
 
             <div className="divider" />

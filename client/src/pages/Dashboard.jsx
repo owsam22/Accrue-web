@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { TrendingUp, TrendingDown, Wallet, Users, Receipt, ArrowRight, RefreshCw, PieChart as PieIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Wallet, Users, Receipt, ArrowRight, PieChart as PieIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
@@ -299,10 +299,7 @@ const Dashboard = () => {
           <h1 className="page-title">{getGreeting()}, {user?.name?.split(' ')[0] || 'User'}</h1>
           <p className="page-subtitle">{d.month} overview</p>
         </div>
-        <button className="btn btn-secondary btn-sm" onClick={refresh} disabled={isSyncing}>
-          <RefreshCw size={14} className={isSyncing ? 'spin-once' : ''} />
-          {isSyncing ? 'Syncing…' : 'Refresh'}
-        </button>
+        <div />
       </div>
 
       {/* Stats */}
