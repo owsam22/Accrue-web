@@ -1,23 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Wallet, ArrowLeftRight, Receipt, Users,
   LogOut, Menu, X, TrendingUp,
 } from 'lucide-react';
+import useCachedFetch from '../hooks/useCachedFetch';
+import { getDashboard, getCachedDashboard } from '../api/dashboard';
 
 const navItems = [
-  { to: '/dashboard',    label: 'Dashboard',    Icon: LayoutDashboard },
-  { to: '/accounts',     label: 'Accounts',     Icon: Wallet           },
-  { to: '/transactions', label: 'Transactions', Icon: ArrowLeftRight   },
-  { to: '/bills',        label: 'Bills',        Icon: Receipt          },
-  { to: '/splits',       label: 'Splits',       Icon: Users            },
+  { to: '/dashboard',    label: 'Dashboard',    Icon: LayoutDashboard, key: 'dashboard' },
+  { to: '/accounts',     label: 'Accounts',     Icon: Wallet,           key: 'accounts'  },
+  { to: '/transactions', label: 'Transactions', Icon: ArrowLeftRight,   key: 'transactions' },
+  { to: '/bills',        label: 'Bills',        Icon: Receipt,          key: 'bills'     },
+  { to: '/splits',       label: 'Splits',       Icon: Users,            key: 'splits'    },
 ];
 
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { data } = useCachedFetch(useCallback(getDashboard, []), getCachedDashboard);
+  const d = data || {};
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -55,18 +59,31 @@ const Sidebar = () => {
 
         {/* Nav */}
         <nav className="sidebar-nav">
-          {navItems.map(({ to, label, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/dashboard'}
-              className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}
-              onClick={() => setMobileOpen(false)}
-            >
-              <Icon size={18} />
-              <span>{label}</span>
-            </NavLink>
-          ))}
+          {navItems.map(({ to, label, Icon, key }) => {
+            const hasDrafts = key === 'bills' ? d.upcomingBillsCount > 0 : key === 'splits' ? d.activeSplitsCount > 0 : false;
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                end={to === '/dashboard'}
+                className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}
+                onClick={() => setMobileOpen(false)}
+                style={{ position: 'relative' }}
+              >
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon size={18} />
+                  {hasDrafts && (
+                    <span style={{ 
+                      position: 'absolute', top: -2, right: -2, 
+                      width: 8, height: 8, background: 'var(--danger)', 
+                      borderRadius: '50%', border: '2px solid var(--bg-surface)' 
+                    }} />
+                  )}
+                </div>
+                <span>{label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
 
         <div className="sidebar-footer">

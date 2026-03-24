@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import Modal from './Modal';
 import { getAccounts, getCachedAccounts } from '../api/accounts';
 import { createTransaction } from '../api/transactions';
+import { getDashboard, getCachedDashboard } from '../api/dashboard';
 import useCachedFetch from '../hooks/useCachedFetch';
 
 /* ── Styled Components ───────────────────────────────────────────────── */
@@ -82,6 +83,8 @@ const BottomNav = ({ onTxAdded }) => {
 
   const fetchAcc = useCallback(getAccounts, []);
   const { data: accounts } = useCachedFetch(fetchAcc, getCachedAccounts);
+  const { data: dashData } = useCachedFetch(useCallback(getDashboard, []), getCachedDashboard);
+  const d = dashData || {};
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -98,11 +101,11 @@ const BottomNav = ({ onTxAdded }) => {
   };
 
   const navItems = [
-    { to: '/dashboard', label: 'Home',    Icon: LayoutDashboard },
-    { to: '/accounts',  label: 'Accounts', Icon: Wallet },
+    { to: '/dashboard', label: 'Home',    Icon: LayoutDashboard, key: 'dashboard' },
+    { to: '/accounts',  label: 'Accounts', Icon: Wallet,           key: 'accounts'  },
     null, // FAB placeholder
-    { to: '/bills',     label: 'Bills',    Icon: Receipt },
-    { to: '/splits',    label: 'Splits',   Icon: Users },
+    { to: '/bills',     label: 'Bills',    Icon: Receipt,          key: 'bills'     },
+    { to: '/splits',    label: 'Splits',   Icon: Users,            key: 'splits'    },
   ];
 
   return (
@@ -123,10 +126,20 @@ const BottomNav = ({ onTxAdded }) => {
               <span style={{ fontSize: '0.65rem', fontWeight: 600, color: 'var(--accent)' }}>Add</span>
             </FabWrapper>
           );
-          const { to, label, Icon } = item;
+          const { to, label, Icon, key } = item;
+          const hasDrafts = key === 'bills' ? d.upcomingBillsCount > 0 : key === 'splits' ? d.activeSplitsCount > 0 : false;
           return (
             <NavItem key={to} to={to} end={to === '/dashboard'}>
-              <Icon size={22} />
+              <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon size={22} />
+                {hasDrafts && (
+                  <span style={{ 
+                    position: 'absolute', top: -2, right: -2, 
+                    width: 9, height: 9, background: 'var(--danger)', 
+                    borderRadius: '50%', border: '2px solid rgba(255,255,255,0.9)' 
+                  }} />
+                )}
+              </div>
               <span>{label}</span>
             </NavItem>
           );

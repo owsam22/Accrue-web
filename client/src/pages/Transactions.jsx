@@ -1,7 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Plus, Trash2, Filter, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Plus, Trash2, Filter, Search, ArrowLeft } from 'lucide-react';
 import Layout from '../components/Layout';
 import Modal from '../components/Modal';
+import Loader from '../components/newloader';
 import useCachedFetch from '../hooks/useCachedFetch';
 import { getTransactions, getCachedTransactions, createTransaction, deleteTransaction } from '../api/transactions';
 import { getAccounts, getCachedAccounts } from '../api/accounts';
@@ -59,13 +61,16 @@ const Transactions = () => {
   };
 
   if (isLoading && !transactions.length) {
-    return <Layout><div className="loading-overlay"><div className="spinner" /><p>Connecting to server...</p></div></Layout>;
+    return <Layout><div className="loading-overlay"><Loader /><p style={{ marginTop: 12, color: 'var(--text-3)', fontWeight: 600 }}>Connecting to server...</p></div></Layout>;
   }
 
   return (
     <Layout>
       <div className="page-header">
         <div>
+          <Link to="/dashboard" className="breadcrumb">
+            <ArrowLeft size={14} /> Dashboard
+          </Link>
           <h1 className="page-title">Transactions</h1>
           <p className="page-subtitle">{txData?.total || 0} total</p>
         </div>
@@ -75,14 +80,14 @@ const Transactions = () => {
       </div>
 
       {/* Filters */}
-      <div className="filter-bar">
-        <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
+      <div className="filter-bar" style={{ flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: 4 }}>
+        <div style={{ position: 'relative', flex: '1 0 160px', minWidth: 160 }}>
           <Search size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-3)' }} />
-          <input className="form-input" style={{ paddingLeft: 36 }} placeholder="Search transactions…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <input className="form-input" style={{ paddingLeft: 36 }} placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         {['', 'income', 'expense', 'transfer'].map((t) => (
-          <button key={t} className={`btn btn-sm ${typeFilter === t ? 'btn-primary' : 'btn-secondary'}`} style={{ textTransform: 'capitalize' }} onClick={() => setTypeFilter(t)}>
-            {t === '' ? 'All' : t === 'transfer' ? 'Self transfer' : t}
+          <button key={t} className={`btn btn-sm ${typeFilter === t ? 'btn-primary' : 'btn-secondary'}`} style={{ textTransform: 'capitalize', flexShrink: 0 }} onClick={() => setTypeFilter(t)}>
+            {t === '' ? 'All' : t === 'transfer' ? 'Transfer' : t}
           </button>
         ))}
       </div>

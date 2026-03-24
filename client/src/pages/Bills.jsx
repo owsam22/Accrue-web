@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Plus, CheckCircle, Trash2, Clock, AlertCircle } from 'lucide-react';
+import { Plus, CheckCircle, Trash2, Clock, AlertCircle, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Modal from '../components/Modal';
+import Loader from '../components/newloader';
 import useCachedFetch from '../hooks/useCachedFetch';
 import { getBills, getCachedBills, createBill, payBill, deleteBill } from '../api/bills';
 import { getAccounts, getCachedAccounts } from '../api/accounts';
@@ -50,7 +52,7 @@ const Bills = () => {
     await deleteBill(id); refresh();
   };
 
-  if (isLoading && !bills?.length) return <Layout><div className="loading-overlay"><div className="spinner"/></div></Layout>;
+  if (isLoading && !bills?.length) return <Layout><div className="loading-overlay"><Loader /><p style={{ marginTop: 12, color: 'var(--text-3)', fontWeight: 600 }}>Connecting to server...</p></div></Layout>;
 
   const unpaid = (bills || []).filter(b => !b.isPaid);
   const paid   = (bills || []).filter(b =>  b.isPaid);
@@ -59,6 +61,9 @@ const Bills = () => {
     <Layout>
       <div className="page-header">
         <div>
+          <Link to="/dashboard" className="breadcrumb">
+            <ArrowLeft size={14} /> Dashboard
+          </Link>
           <h1 className="page-title">Bills</h1>
           <p className="page-subtitle">{unpaid.length} unpaid · {paid.length} paid</p>
         </div>

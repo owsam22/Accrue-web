@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Wallet, CreditCard, PiggyBank, Landmark } from 'lucide-react';
+import { Plus, Pencil, Trash2, Wallet, CreditCard, PiggyBank, Landmark, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Modal from '../components/Modal';
+import Loader from '../components/newloader';
 import useCachedFetch from '../hooks/useCachedFetch';
 import { getAccounts, getCachedAccounts, createAccount, updateAccount, deleteAccount } from '../api/accounts';
 
@@ -62,7 +64,7 @@ const Accounts = () => {
   };
 
   if (isLoading && !accounts?.length) {
-    return <Layout><div className="loading-overlay"><div className="spinner" /></div></Layout>;
+    return <Layout><div className="loading-overlay"><Loader /><p style={{ marginTop: 12, color: 'var(--text-3)', fontWeight: 600 }}>Connecting to server...</p></div></Layout>;
   }
 
   const totalBalance = (accounts || []).reduce((s, a) => s + a.balance, 0);
@@ -71,6 +73,9 @@ const Accounts = () => {
     <Layout>
       <div className="page-header">
         <div>
+          <Link to="/dashboard" className="breadcrumb">
+            <ArrowLeft size={14} /> Dashboard
+          </Link>
           <h1 className="page-title">Accounts</h1>
           <p className="page-subtitle">Total: {fmt(totalBalance)}</p>
         </div>

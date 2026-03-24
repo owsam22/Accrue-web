@@ -107,8 +107,15 @@ a:hover { color: var(--accent); }
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
-    padding: 64px 16px 80px 16px; /* Top padding protects from hamburger button */
+    padding: 64px 16px 88px 16px; /* extra bottom for bottom nav */
+    max-width: 100vw;
+    overflow-x: hidden;
   }
+  .desktop-only { display: none !important; }
+}
+
+@media (min-width: 769px) {
+  .mobile-only { display: none !important; }
 }
 
 /* ── Page Header ────────────────────────────────────────────────────────────── */
@@ -127,10 +134,28 @@ a:hover { color: var(--accent); }
   color: var(--text-1);
 }
 
-.page-subtitle {
-  font-size: 0.85rem;
+.page-subtitle { font-size: 0.88rem; color: var(--text-3); }
+
+.breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   color: var(--text-3);
-  margin-top: 2px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  margin-bottom: 6px;
+  background: var(--bg-elevated);
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  transition: all var(--transition);
+}
+
+.breadcrumb:hover {
+  background: var(--bg-hover);
+  color: var(--accent);
 }
 
 /* ── Cards ──────────────────────────────────────────────────────────────────── */

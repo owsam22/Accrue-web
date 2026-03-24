@@ -1,7 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Plus, CheckCircle, Trash2, Users } from 'lucide-react';
+import { Plus, CheckCircle, Trash2, Users, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import Modal from '../components/Modal';
+import Loader from '../components/newloader';
 import useCachedFetch from '../hooks/useCachedFetch';
 import { getSplits, getCachedSplits, createSplit, settleParticipant, deleteSplit } from '../api/splits';
 import { getAccounts, getCachedAccounts } from '../api/accounts';
@@ -62,7 +64,7 @@ const Splits = () => {
   };
 
   if (isLoading && !splits?.length)
-    return <Layout><div className="loading-overlay"><div className="spinner"/></div></Layout>;
+    return <Layout><div className="loading-overlay"><Loader /><p style={{ marginTop: 12, color: 'var(--text-3)', fontWeight: 600 }}>Connecting to server...</p></div></Layout>;
 
   const active   = (splits || []).filter(s => !s.isSettled);
   const settled  = (splits || []).filter(s =>  s.isSettled);
@@ -71,6 +73,9 @@ const Splits = () => {
     <Layout>
       <div className="page-header">
         <div>
+          <Link to="/dashboard" className="breadcrumb">
+            <ArrowLeft size={14} /> Dashboard
+          </Link>
           <h1 className="page-title">Splits</h1>
           <p className="page-subtitle">{active.length} active · {settled.length} settled</p>
         </div>
