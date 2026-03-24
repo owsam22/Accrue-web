@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Trash2, Filter, Search, ArrowLeft } from 'lucide-react';
+import { Plus, Trash2, Filter, Search } from 'lucide-react';
 import Layout from '../components/Layout';
+import BackButton from '../components/BackButton';
 import Modal from '../components/Modal';
 import Loader from '../components/newloader';
 import useCachedFetch from '../hooks/useCachedFetch';
@@ -75,9 +76,7 @@ const Transactions = () => {
     <Layout>
       <div className="page-header">
         <div>
-          <Link to="/dashboard" className="breadcrumb">
-            <ArrowLeft size={14} /> Dashboard
-          </Link>
+          <BackButton />
           <h1 className="page-title">Transactions</h1>
           <p className="page-subtitle">{txData?.total || 0} total</p>
         </div>

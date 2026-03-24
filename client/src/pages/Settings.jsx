@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { User, Mail, LogOut, Save, Shield, Moon, Sun, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
+import BackButton from '../components/BackButton';
 import { useAuth } from '../context/AuthContext';
 import Switch from '../components/toggele';
 import { updateProfile } from '../api/auth';
@@ -49,6 +50,8 @@ const Settings = () => {
   return (
     <Layout>
       <div className="fade-up">
+        <BackButton />
+
         <div className="page-header">
           <div>
             <h1 className="page-title">Settings</h1>

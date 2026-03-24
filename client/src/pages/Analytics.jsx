@@ -3,9 +3,9 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
-import { TrendingUp, TrendingDown, Calendar, PieChart as PieIcon, ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { TrendingUp, TrendingDown, Calendar, PieChart as PieIcon } from 'lucide-react';
 import Layout from '../components/Layout';
+import BackButton from '../components/BackButton';
 import Loader from '../components/newloader';
 import useCachedFetch from '../hooks/useCachedFetch';
 import { getAnalytics, getCachedAnalytics } from '../api/analytics';
@@ -36,9 +36,7 @@ const Analytics = () => {
     <Layout>
       <div className="page-header">
         <div>
-          <Link to="/dashboard" className="breadcrumb">
-            <ArrowLeft size={12} /> Back to Dashboard
-          </Link>
+          <BackButton />
           <h1 className="page-title" style={{ marginTop: 4 }}>Analytics</h1>
           <p className="page-subtitle">Deep dive into your spending habits</p>
         </div>

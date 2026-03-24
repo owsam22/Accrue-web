@@ -204,26 +204,9 @@ a:hover { color: var(--accent); }
 
 .page-subtitle { font-size: 0.88rem; color: var(--text-3); }
 
-.breadcrumb {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-3);
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  text-decoration: none;
-  margin-bottom: 6px;
-  background: var(--bg-elevated);
-  padding: 4px 8px;
-  border-radius: var(--r-sm);
-  transition: all var(--transition);
-}
-
-.breadcrumb:hover {
-  background: var(--bg-hover);
-  color: var(--accent);
+/* ── Back Button ────────────────────────────────────────────────────────────── */
+.back-button-container {
+  margin-bottom: 24px;
 }
 
 /* ── Cards ──────────────────────────────────────────────────────────────────── */

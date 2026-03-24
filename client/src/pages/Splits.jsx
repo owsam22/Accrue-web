@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import { Plus, CheckCircle, Trash2, Users, ArrowLeft } from 'lucide-react';
+import { Plus, CheckCircle, Trash2, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
+import BackButton from '../components/BackButton';
 import Modal from '../components/Modal';
 import Loader from '../components/newloader';
 import useCachedFetch from '../hooks/useCachedFetch';
@@ -80,9 +81,7 @@ const Splits = () => {
     <Layout>
       <div className="page-header">
         <div>
-          <Link to="/dashboard" className="breadcrumb">
-            <ArrowLeft size={14} /> Dashboard
-          </Link>
+          <BackButton />
           <h1 className="page-title">Splits & Debts</h1>
           <p className="page-subtitle">{active.length} active · {settled.length} settled</p>
         </div>
