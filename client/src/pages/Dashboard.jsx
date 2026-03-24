@@ -409,7 +409,12 @@ const Dashboard = () => {
                       outerRadius={65}
                       paddingAngle={5}
                       dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => ({
+                        text: `${name} ${(percent * 100).toFixed(0)}%`,
+                        fill: 'var(--text-1)',
+                        fontSize: 10,
+                        fontWeight: 600
+                      })}
                       labelLine={false}
                     >
                       {d.categoryData.map((entry, index) => (
