@@ -30,7 +30,7 @@ const StyledWrapper = styled.div`
     /* SeaGreen */
     --txt-color: #ffffff;
     /* White text */
-    --duration: 4s;
+    --duration: 2s;
 
     position: relative;
     width: 110px;
@@ -105,13 +105,13 @@ const StyledWrapper = styled.div`
   .wallet-loader .bill-2 {
     z-index: 2;
     animation: slide-in var(--duration) ease-in-out infinite;
-    animation-delay: 0.8s;
+    animation-delay: 0.3s;
   }
 
   .wallet-loader .bill-3 {
     z-index: 3;
     animation: slide-in var(--duration) ease-in-out infinite;
-    animation-delay: 1.6s;
+    animation-delay: 0.6s;
   }
 
   /* --- WALLET FRONT --- */

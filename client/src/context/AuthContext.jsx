@@ -13,17 +13,24 @@ export const AuthProvider = ({ children }) => {
   // Verify stored token on mount
   useEffect(() => {
     if (!token) { setLoading(false); return; }
+
+    // Optimization: If we already have a cached user, we can stop the initial
+    // full-screen loader immediately and let the app hydrate.
+    // getMe() will still run in background to verify/refresh the session.
+    if (user) {
+      setLoading(false);
+    }
+
     getMe()
-      .then((profile) => { setUser(profile); })
+      .then((profile) => {
+        setUser(profile);
+        localStorage.setItem('accrue_user', JSON.stringify(profile));
+      })
       .catch((err) => {
-        // Only force-logout on explicit server rejection (401 Unauthorized).
-        // Network errors (server down, offline) should NOT clear the session
-        // so the user can still access cached data.
         const status = err?.response?.status ?? err?.status;
         if (status === 401) {
           logout();
         }
-        // else: keep token+user intact, app continues with cached data
       })
       .finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
