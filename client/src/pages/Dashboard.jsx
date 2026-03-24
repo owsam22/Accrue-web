@@ -101,21 +101,24 @@ const StyledStatCard = styled(motion.div)`
   }
 `;
 
-const StatCard = ({ label, value, Icon, iconBg, color, delay }) => (
-  <StyledStatCard 
-    className="stat-card"
-    $themeColor={color}
-    $iconBg={iconBg}
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay: delay * 0.1, duration: 0.4 }}
-  >
-    <span className="label">{label}</span>
-    <span className="value" style={{ color }}>{value}</span>
-    <div className="icon-wrapper">
-      <Icon size={20} />
-    </div>
-  </StyledStatCard>
+const StatCard = ({ label, value, Icon, iconBg, color, delay, to }) => (
+  <Link to={to} style={{ textDecoration: 'none', display: 'block' }}>
+    <StyledStatCard 
+      className="stat-card"
+      $themeColor={color}
+      $iconBg={iconBg}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: delay * 0.1, duration: 0.4 }}
+      style={{ cursor: 'pointer' }}
+    >
+      <span className="label">{label}</span>
+      <span className="value" style={{ color }}>{value}</span>
+      <div className="icon-wrapper">
+        <Icon size={20} />
+      </div>
+    </StyledStatCard>
+  </Link>
 );
 
 const EMPTY_TX_FORM = { accountId: '', toAccountId: '', type: 'expense', amount: '', category: 'Food', specifiedCategory: '', note: '', date: new Date().toISOString().slice(0, 10) };
@@ -160,9 +163,9 @@ const Dashboard = () => {
 
       {/* Stats */}
       <div className="stat-grid">
-        <StatCard label="Total Balance"    value={fmt(d.totalBalance)}    Icon={Wallet}      iconBg="var(--accent-dim)"  color="var(--text-1)"     delay={1} />
-        <StatCard label="Monthly Income"   value={fmt(d.monthlyIncome)}   Icon={TrendingUp}  iconBg="var(--success-dim)" color="var(--success)"    delay={2} />
-        <StatCard label="Monthly Expenses" value={fmt(d.monthlyExpense)}  Icon={TrendingDown} iconBg="var(--danger-dim)" color="var(--danger)"     delay={3} />
+        <StatCard label="Total Balance"    value={fmt(d.totalBalance)}    Icon={Wallet}      iconBg="var(--accent-dim)"  color="var(--text-1)"     delay={1} to="/accounts" />
+        <StatCard label="Monthly Income"   value={fmt(d.monthlyIncome)}   Icon={TrendingUp}  iconBg="var(--success-dim)" color="var(--success)"    delay={2} to="/transactions?type=income" />
+        <StatCard label="Monthly Expenses" value={fmt(d.monthlyExpense)}  Icon={TrendingDown} iconBg="var(--danger-dim)" color="var(--danger)"     delay={3} to="/transactions?type=expense" />
       </div>
 
       <div className="dashboard-grid">

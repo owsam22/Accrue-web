@@ -11,7 +11,7 @@ import { getAccounts, getCachedAccounts } from '../api/accounts';
 const fmt = (n) =>
   new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n ?? 0);
 
-const EMPTY_FORM = { description: '', totalAmount: '', accountId: '', notes: '', participants: [{ name: '', amount: '' }] };
+const EMPTY_FORM = { description: '', totalAmount: '', accountId: '', notes: '', participants: [{ name: '', amount: '' }], type: 'split', applyAsTransaction: true };
 
 const Splits = () => {
   const fetchSplits = useCallback(getSplits, []);
@@ -40,11 +40,15 @@ const Splits = () => {
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true);
     try {
-      await createSplit({
+      const payload = {
         ...form,
         totalAmount: parseFloat(form.totalAmount),
-        participants: form.participants.map(p => ({ name: p.name, amount: parseFloat(p.amount) })),
-      });
+        participants: form.participants.map(p => ({
+          name: p.name,
+          amount: parseFloat(p.amount)
+        })),
+      };
+      await createSplit(payload);
       setModal(false);
       refresh();
     } catch (err) { console.error(err); } finally { setSaving(false); }
@@ -63,11 +67,14 @@ const Splits = () => {
     await deleteSplit(id); refresh();
   };
 
+  const [filterType, setFilterType] = useState('all');
+
   if (isLoading && !splits?.length)
     return <Layout><div className="loading-overlay"><Loader /><p style={{ marginTop: 12, color: 'var(--text-3)', fontWeight: 600 }}>Connecting to server...</p></div></Layout>;
 
-  const active   = (splits || []).filter(s => !s.isSettled);
-  const settled  = (splits || []).filter(s =>  s.isSettled);
+  const filtered = (splits || []).filter(s => filterType === 'all' || s.type === filterType);
+  const active   = filtered.filter(s => !s.isSettled);
+  const settled  = filtered.filter(s =>  s.isSettled);
 
   return (
     <Layout>
@@ -76,12 +83,25 @@ const Splits = () => {
           <Link to="/dashboard" className="breadcrumb">
             <ArrowLeft size={14} /> Dashboard
           </Link>
-          <h1 className="page-title">Splits</h1>
+          <h1 className="page-title">Splits & Debts</h1>
           <p className="page-subtitle">{active.length} active · {settled.length} settled</p>
         </div>
         <button className="btn btn-primary" onClick={() => { setForm(EMPTY_FORM); setModal(true); }}>
-          <Plus size={16}/> New Split
+          <Plus size={16}/> New Entry
         </button>
+      </div>
+
+      <div className="filter-bar" style={{ marginBottom: 20, display: 'flex', gap: 8 }}>
+        {['all', 'split', 'lend', 'borrow'].map(t => (
+          <button 
+            key={t} 
+            className={`btn btn-sm ${filterType === t ? 'btn-primary' : 'btn-secondary'}`}
+            onClick={() => setFilterType(t)}
+            style={{ textTransform: 'capitalize' }}
+          >
+            {t === 'all' ? 'All' : t}
+          </button>
+        ))}
       </div>
 
       {!splits?.length ? (
@@ -103,8 +123,13 @@ const Splits = () => {
               <div key={split._id} className="card fade-up" style={{ opacity: split.isSettled ? 0.6 : 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
                   <div>
-                    <h4 style={{ color: 'var(--text-1)' }}>{split.description}</h4>
-                    <p style={{ fontSize: '0.78rem', color: 'var(--text-3)', marginTop: 2 }}>
+                    <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+                      <span className={`badge ${split.type === 'split' ? 'badge-info' : split.type === 'lend' ? 'badge-expense' : 'badge-income'}`} style={{ fontSize: '0.65rem' }}>
+                        {split.type}
+                      </span>
+                      <h4 style={{ color: 'var(--text-1)', margin: 0 }}>{split.description}</h4>
+                    </div>
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>
                       {paidCount}/{split.participants.length} settled · {fmt(paidAmt)} / {fmt(split.totalAmount)}
                     </p>
                   </div>
@@ -148,20 +173,52 @@ const Splits = () => {
         </div>
       )}
 
-      {/* Create Split Modal */}
-      <Modal isOpen={modal} onClose={() => setModal(false)} title="New Split" size="lg">
+      <Modal isOpen={modal} onClose={() => setModal(false)} title="New Entry" size="lg">
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className="tx-form-row">
+            {['split', 'lend', 'borrow'].map(t => (
+              <button 
+                key={t} 
+                type="button" 
+                className={`btn btn-sm ${form.type === t ? 'btn-primary' : 'btn-secondary'}`}
+                style={{ flex: 1, textTransform: 'capitalize' }}
+                onClick={() => {
+                  const newParticipants = (t === 'lend' || t === 'borrow') 
+                    ? [{ name: '', amount: form.totalAmount }] 
+                    : form.participants;
+                  setForm({ ...form, type: t, participants: newParticipants });
+                }}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
           <div className="form-group">
             <label className="form-label">Description *</label>
-            <input className="form-input" required value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="e.g. Goa Trip"/>
+            <input className="form-input" required value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="e.g. Goa Trip or Lunch with Sam"/>
           </div>
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">Total Amount *</label>
-              <input className="form-input" type="number" required min="0.01" step="0.01" value={form.totalAmount} onChange={e => setForm({...form, totalAmount: e.target.value})}/>
+              <input 
+                className="form-input" 
+                type="number" 
+                required 
+                min="0.01" 
+                step="0.01" 
+                value={form.totalAmount} 
+                onChange={e => {
+                  const val = e.target.value;
+                  const newParts = (form.type === 'lend' || form.type === 'borrow')
+                    ? [{ ...form.participants[0], amount: val }]
+                    : form.participants;
+                  setForm({ ...form, totalAmount: val, participants: newParts });
+                }}
+              />
             </div>
             <div className="form-group">
-              <label className="form-label">Credit Account</label>
+              <label className="form-label">Account</label>
               <select className="form-select" value={form.accountId} onChange={e => setForm({...form, accountId: e.target.value})}>
                 <option value="">Select account</option>
                 {(accounts||[]).map(a => <option key={a._id} value={a._id}>{a.name}</option>)}
@@ -169,19 +226,44 @@ const Splits = () => {
             </div>
           </div>
 
-          {/* Participants */}
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: '0.85rem', color: 'var(--text-2)' }}>
+            <input 
+              type="checkbox" 
+              checked={form.applyAsTransaction} 
+              onChange={e => setForm({ ...form, applyAsTransaction: e.target.checked })}
+              style={{ width: 16, height: 16 }}
+            />
+            Record as {form.type === 'borrow' ? 'Income' : 'Expense'} now
+          </label>
+
+          {/* Participants - only for 'split' type or single person for lend/borrow */}
           <div>
             <div className="section-header" style={{ marginBottom: 10 }}>
-              <span className="section-title">Participants</span>
-              <button type="button" className="btn btn-secondary btn-sm" onClick={addParticipant}>
-                <Plus size={13}/> Add
-              </button>
+              <span className="section-title">
+                {form.type === 'split' ? 'Participants (excluding you)' : form.type === 'lend' ? 'Lending to' : 'Borrowing from'}
+              </span>
+              {form.type === 'split' && (
+                <button type="button" className="btn btn-secondary btn-sm" onClick={addParticipant}>
+                  <Plus size={13}/> Add
+                </button>
+              )}
             </div>
             {form.participants.map((p, i) => (
               <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 8, alignItems: 'center' }}>
-                <input className="form-input" placeholder="Name" value={p.name} onChange={e => updateParticipant(i, 'name', e.target.value)} style={{ flex: 2 }}/>
-                <input className="form-input" placeholder="Amount" type="number" min="0" step="0.01" value={p.amount} onChange={e => updateParticipant(i, 'amount', e.target.value)} style={{ flex: 1 }}/>
-                {form.participants.length > 1 && (
+                <input className="form-input" placeholder="Name" required value={p.name} onChange={e => updateParticipant(i, 'name', e.target.value)} style={{ flex: 2 }}/>
+                <input 
+                  className="form-input" 
+                  placeholder="Amount" 
+                  type="number" 
+                  required
+                  min="0" 
+                  step="0.01" 
+                  value={p.amount} 
+                  onChange={e => updateParticipant(i, 'amount', e.target.value)} 
+                  style={{ flex: 1 }}
+                  disabled={form.type !== 'split'}
+                />
+                {form.type === 'split' && form.participants.length > 1 && (
                   <button type="button" className="btn btn-icon btn-danger" onClick={() => removeParticipant(i)}><Trash2 size={13}/></button>
                 )}
               </div>
@@ -198,12 +280,18 @@ const Splits = () => {
       {/* Settle Participant Modal */}
       <Modal isOpen={!!settleModal} onClose={() => setSettleModal(null)} title={`Settle — ${settleModal?.participant?.name}`} size="sm">
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <p style={{ color: 'var(--text-2)' }}>Receiving <strong style={{ color: 'var(--text-1)' }}>{fmt(settleModal?.participant?.amount)}</strong> into:</p>
+          <p style={{ color: 'var(--text-2)' }}>
+            {settleModal?.split?.type === 'borrow' ? 'Repaying' : 'Receiving'}{' '}
+            <strong style={{ color: 'var(--text-1)' }}>{fmt(settleModal?.participant?.amount)}</strong>{' '}
+            {settleModal?.split?.type === 'borrow' ? 'from' : 'into'}:
+          </p>
           <select className="form-select" value={settleAccountId} onChange={e => setSettleAccountId(e.target.value)}>
             <option value="">Select account</option>
             {(accounts||[]).map(a => <option key={a._id} value={a._id}>{a.name}</option>)}
           </select>
-          <p style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>This will create an income transaction in your account.</p>
+          <p style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>
+            This will create an {settleModal?.split?.type === 'borrow' ? 'expense' : 'income'} transaction in your account.
+          </p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
             <button className="btn btn-secondary" onClick={() => setSettleModal(null)}>Cancel</button>
             <button className="btn btn-success" disabled={!settleAccountId || saving} onClick={handleSettle}>

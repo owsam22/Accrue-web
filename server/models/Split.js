@@ -58,11 +58,22 @@ const splitSchema = new mongoose.Schema(
       default: 'INR',
       uppercase: true,
     },
-    // Account to credit when participants settle (income to current user)
+    // Account to credit/debit when created/settled
     accountId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Account',
       default: null,
+    },
+    // The transaction created when the split/debt was initiated (e.g. full payment)
+    initialTransactionId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Transaction',
+      default: null,
+    },
+    type: {
+      type: String,
+      enum: ['split', 'lend', 'borrow'],
+      default: 'split',
     },
     participants: {
       type: [participantSchema],

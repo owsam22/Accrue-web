@@ -17,7 +17,26 @@ const getSplits = async (req, res) => {
 
 // POST /api/splits
 const createSplit = async (req, res) => {
-  const { description, totalAmount, currency, accountId, participants, notes } = req.body;
+  const { description, totalAmount, currency, accountId, participants, notes, type, applyAsTransaction } = req.body;
+
+  let initialTransactionId = null;
+  if (applyAsTransaction && accountId) {
+    const txType = type === 'borrow' ? 'income' : 'expense';
+    const transaction = await Transaction.create({
+      userId: req.userId,
+      accountId,
+      type: txType,
+      amount: totalAmount,
+      category: type === 'split' ? 'Split' : type === 'lend' ? 'Lending' : 'Borrowing',
+      note: `${description} (${type})`,
+      date: new Date(),
+      reference: 'split_settlement',
+    });
+
+    const delta = txType === 'income' ? totalAmount : -totalAmount;
+    await applyBalanceDelta(accountId, req.userId, delta);
+    initialTransactionId = transaction._id;
+  }
 
   const split = await Split.create({
     userId: req.userId,
@@ -27,6 +46,8 @@ const createSplit = async (req, res) => {
     accountId: accountId || null,
     participants: participants || [],
     notes: notes || '',
+    type: type || 'split',
+    initialTransactionId,
   });
 
   res.status(201).json(split);
@@ -42,24 +63,25 @@ const settleParticipant = async (req, res) => {
   if (!participant) return res.status(404).json({ message: 'Participant not found.' });
   if (participant.isPaid) return res.status(400).json({ message: 'Participant already settled.' });
 
-  const accountId = req.body.accountId || split.accountId;
+  const txType = split.type === 'borrow' ? 'expense' : 'income';
 
   let transaction = null;
   if (accountId) {
-    // Create income transaction — the participant paid us back
+    // Create transaction — depending on split type
     transaction = await Transaction.create({
       userId: req.userId,
       accountId,
-      type: 'income',
+      type: txType,
       amount: participant.amount,
-      category: 'Split Settlement',
-      note: `${participant.name} settled share — ${split.description}`,
+      category: split.type === 'borrow' ? 'Debt Repayment' : 'Split Settlement',
+      note: `${participant.name} ${split.type === 'borrow' ? 'repaid' : 'settled'} — ${split.description}`,
       date: new Date(),
       reference: 'split_settlement',
       referenceId: split._id,
     });
 
-    await applyBalanceDelta(accountId, req.userId, participant.amount);
+    const delta = txType === 'income' ? participant.amount : -participant.amount;
+    await applyBalanceDelta(accountId, req.userId, delta);
   }
 
   // Mark participant paid
@@ -92,6 +114,20 @@ const updateSplit = async (req, res) => {
 const deleteSplit = async (req, res) => {
   const split = await Split.findOne({ _id: req.params.id, userId: req.userId });
   if (!split) return res.status(404).json({ message: 'Split not found.' });
+
+  // If there's an initial transaction, remove it too
+  if (split.initialTransactionId) {
+    const tx = await Transaction.findOne({ _id: split.initialTransactionId, userId: req.userId });
+    if (tx) {
+      const delta = tx.type === 'income' ? -tx.amount : tx.amount;
+      try {
+        await applyBalanceDelta(tx.accountId, req.userId, delta);
+        await tx.deleteOne();
+      } catch (err) {
+        console.error('Failed to reverse initial split transaction:', err);
+      }
+    }
+  }
 
   await split.deleteOne();
   res.json({ message: 'Split deleted.' });
