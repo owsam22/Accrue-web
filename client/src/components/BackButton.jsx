@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -10,14 +11,11 @@ const BackButton = ({ to = "/dashboard", label = "Back to Dashboard" }) => {
       className="back-button-container"
     >
       <StyledWrapper>
-        <Link to={to} className="cssbuttons-io-button">
+        <Link to={to} className="button">
+          <svg className="icon" viewBox="0 0 24 24" fill="currentColor" style={{ transform: 'rotate(180deg)' }}>
+            <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z" clipRule="evenodd" />
+          </svg>
           {label}
-          <div className="icon">
-            <svg height={24} width={24} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M0 0h24v24H0z" fill="none" />
-              <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor" />
-            </svg>
-          </div>
         </Link>
       </StyledWrapper>
     </motion.div>
@@ -25,60 +23,75 @@ const BackButton = ({ to = "/dashboard", label = "Back to Dashboard" }) => {
 }
 
 const StyledWrapper = styled.div`
-  .cssbuttons-io-button {
-    background: var(--accent);
-    color: white;
-    font-family: inherit;
-    padding: 0.35em;
-    padding-left: 1.25em;
-    font-size: 15px;
-    font-weight: 600;
-    border-radius: 0.9em;
-    border: none;
-    letter-spacing: 0.03em;
-    display: flex;
-    align-items: center;
-    box-shadow: inset 0 0 1.6em -0.6em var(--accent-hover);
-    overflow: hidden;
+  .button {
     position: relative;
-    height: 2.8rem;
-    padding-right: 3.3em;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.3s;
-  }
-
-  .cssbuttons-io-button .icon {
-    background: white;
-    margin-left: 1em;
-    position: absolute;
-    display: flex;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    padding-block: 0.4rem;
+    padding-inline: 1rem;
+    background-color: var(--accent);
+    border-radius: 9999px;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 2.2em;
-    width: 2.2em;
-    border-radius: 0.7em;
-    box-shadow: 0.1em 0.1em 0.6em 0.2em rgba(0,0,0,0.1);
-    right: 0.3em;
-    transition: all 0.3s;
+    color: #ffffff;
+    gap: 8px;
+    font-weight: 700;
+    border: 2.5px solid rgba(255, 255, 255, 0.2);
+    outline: none;
+    overflow: hidden;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: none;
   }
 
-  .cssbuttons-io-button:hover .icon {
-    width: calc(100% - 0.6em);
+  .icon {
+    width: 18px;
+    height: 18px;
+    transition: all 0.3s ease-in-out;
   }
 
-  .cssbuttons-io-button .icon svg {
-    width: 1.1em;
-    transition: transform 0.3s;
-    color: var(--accent);
+  .button:hover {
+    transform: scale(1.05);
+    border-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--accent-hover);
+    box-shadow: 0px 15px 25px rgba(0, 0, 0, 0.15);
   }
 
-  .cssbuttons-io-button:hover .icon svg {
-    transform: translateX(-0.1em);
+  .button:hover .icon {
+    transform: rotate(180deg) translate(4px);
   }
 
-  .cssbuttons-io-button:active .icon {
-    transform: scale(0.95);
+  .button:hover::before {
+    animation: shine 1.5s ease-out infinite;
+  }
+
+  .button::before {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100%;
+    background-image: linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0) 30%,
+      rgba(255, 255, 255, 0.3),
+      rgba(255, 255, 255, 0) 70%
+    );
+    top: 0;
+    left: -100px;
+    opacity: 0.6;
+  }
+
+  @keyframes shine {
+    0% {
+      left: -100px;
+    }
+    60% {
+      left: 100%;
+    }
+    to {
+      left: 100%;
+    }
   }`;
 
 export default BackButton;
