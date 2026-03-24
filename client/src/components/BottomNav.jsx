@@ -111,7 +111,7 @@ const BottomNav = ({ onTxAdded }) => {
 
   return (
     <>
-      <Nav>
+      <Nav className="bottom-nav">
         {navItems.map((item, i) => {
           if (!item) return (
             <FabWrapper key="fab">

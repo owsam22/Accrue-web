@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, Wallet, ArrowLeftRight, Receipt, Users,
-  LogOut, Menu, X, TrendingUp, BarChart2
+  LogOut, Menu, X, TrendingUp, BarChart2, Github,
+  Sun, Moon
 } from 'lucide-react';
 import useCachedFetch from '../hooks/useCachedFetch';
 import { getDashboard, getCachedDashboard } from '../api/dashboard';
@@ -20,9 +21,23 @@ const navItems = [
 const Sidebar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('accrue-theme') === 'dark');
+
   const { data } = useCachedFetch(useCallback(getDashboard, []), getCachedDashboard);
   const d = data || {};
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.setAttribute('data-theme', 'dark');
+      localStorage.setItem('accrue-theme', 'dark');
+    } else {
+      root.setAttribute('data-theme', 'light');
+      localStorage.setItem('accrue-theme', 'light');
+    }
+  }, [isDark]);
 
   useEffect(() => {
     if (mobileOpen) {
@@ -32,6 +47,40 @@ const Sidebar = () => {
     }
     return () => document.body.classList.remove('sidebar-mobile-active');
   }, [mobileOpen]);
+
+  // Swipe-to-open logic
+  useEffect(() => {
+    if (mobileOpen) return; // Only listen if closed
+
+    let startX = 0;
+    let startY = 0;
+
+    const handleStart = (e) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+    };
+
+    const handleEnd = (e) => {
+      if (location.pathname !== '/dashboard') return;
+
+      const endX = e.changedTouches[0].clientX;
+      const endY = e.changedTouches[0].clientY;
+      const dx = endX - startX;
+      const dy = endY - startY;
+
+      // Threshold: Swipe right > 100px, mostly horizontal
+      if (dx > 100 && Math.abs(dy) < 50) {
+        setMobileOpen(true);
+      }
+    };
+
+    document.addEventListener('touchstart', handleStart);
+    document.addEventListener('touchend', handleEnd);
+    return () => {
+      document.removeEventListener('touchstart', handleStart);
+      document.removeEventListener('touchend', handleEnd);
+    };
+  }, [mobileOpen, location.pathname]);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -58,11 +107,22 @@ const Sidebar = () => {
             <div className="logo-icon"><TrendingUp size={20} /></div>
             <span className="logo-text">Accrue</span>
           </NavLink>
-          {mobileOpen && (
-            <button className="mobile-close-btn" onClick={() => setMobileOpen(false)}>
-              <X size={22} />
+          
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              className="theme-toggle" 
+              onClick={() => setIsDark(!isDark)}
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
-          )}
+
+            {mobileOpen && (
+              <button className="mobile-close-btn" onClick={() => setMobileOpen(false)}>
+                <X size={22} />
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="sidebar-divider" />
@@ -115,6 +175,11 @@ const Sidebar = () => {
             <LogOut size={16} />
             <span>Logout</span>
           </button>
+
+          <a href="https://github.com/owsam22" target="_blank" rel="noreferrer" className="sidebar-github">
+            <Github size={14} />
+            <span>Developed by owsam22</span>
+          </a>
         </div>
       </aside>
 
@@ -129,7 +194,7 @@ const Sidebar = () => {
           display: flex;
           flex-direction: column;
           padding: 20px 12px;
-          z-index: 100;
+          z-index: 300;
           transition: transform var(--transition);
         }
         .sidebar-logo {
@@ -198,6 +263,29 @@ const Sidebar = () => {
           transition: all var(--transition);
         }
         .sidebar-logout:hover { background: var(--danger-dim); color: var(--danger); }
+        .sidebar-github {
+          display: flex; align-items: center; justify-content: center; gap: 6px;
+          margin-top: 12px; padding: 8px;
+          color: var(--text-3); font-size: 0.75rem; text-decoration: none;
+          opacity: 0.7; transition: opacity var(--transition);
+        }
+        .sidebar-github:hover { opacity: 1; color: var(--text-1); }
+
+        .theme-toggle {
+          width: 36px; height: 36px;
+          display: flex; align-items: center; justify-content: center;
+          border-radius: var(--r-md);
+          background: var(--bg-overlay);
+          border: 1px solid var(--border);
+          color: var(--text-2);
+          cursor: pointer;
+          transition: all var(--transition);
+        }
+        .theme-toggle:hover {
+          background: var(--bg-hover);
+          color: var(--accent-light);
+          border-color: var(--accent-dim);
+        }
 
         /* Mobile */
         .mobile-menu-btn {
