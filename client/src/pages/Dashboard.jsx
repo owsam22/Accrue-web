@@ -91,9 +91,9 @@ const StatCard = ({ label, value, Icon, iconBg, color, delay }) => (
   </StyledStatCard>
 );
 
-const EMPTY_TX_FORM = { accountId: '', toAccountId: '', type: 'expense', amount: '', category: 'Other', specifiedCategory: '', note: '', date: new Date().toISOString().slice(0, 10) };
+const EMPTY_TX_FORM = { accountId: '', toAccountId: '', type: 'expense', amount: '', category: 'Food', specifiedCategory: '', note: '', date: new Date().toISOString().slice(0, 10) };
 
-const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Salary', 'Investment', 'Transfer', 'Other'];
+const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Salary', 'Investment', 'Other'];
 
 const Dashboard = () => {
   const fetch = useCallback(getDashboard, []);
@@ -205,9 +205,9 @@ const Dashboard = () => {
                     <div className="tx-icon" style={{ background: typeColor[tx.type] + '22' }}>
                       {tx.type === 'income' ? '↓' : tx.type === 'expense' ? '↑' : '⇄'}
                     </div>
-                    <div className="tx-info">
-                      <p className="tx-title">{tx.note || tx.category}</p>
-                      <p className="tx-meta">{tx.accountId?.name} · {fmtDate(tx.date)}</p>
+                    <div className="tx-info" style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                      <p className="tx-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.note || tx.category}</p>
+                      <p className="tx-meta" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.accountId?.name} · {fmtDate(tx.date)}</p>
                     </div>
                     <span className="tx-amount" style={{ color: typeColor[tx.type] }}>
                       {typeSign[tx.type]}{fmt(tx.amount)}

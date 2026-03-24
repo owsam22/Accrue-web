@@ -11,11 +11,11 @@ const fmt = (n) =>
 
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Salary', 'Investment', 'Transfer', 'Other'];
+const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Salary', 'Investment', 'Other'];
 const typeColor = { income: 'var(--success)', expense: 'var(--danger)', transfer: 'var(--accent-light)' };
 const typeSign  = { income: '+', expense: '−', transfer: '' };
 
-const EMPTY_FORM = { accountId: '', toAccountId: '', type: 'expense', amount: '', category: 'Other', specifiedCategory: '', note: '', date: new Date().toISOString().slice(0, 10) };
+const EMPTY_FORM = { accountId: '', toAccountId: '', type: 'expense', amount: '', category: 'Food', specifiedCategory: '', note: '', date: new Date().toISOString().slice(0, 10) };
 
 const Transactions = () => {
   const fetchTx = useCallback(getTransactions, []);
@@ -101,19 +101,19 @@ const Transactions = () => {
                 <div className="tx-icon" style={{ background: typeColor[tx.type] + '22' }}>
                   <span style={{ fontSize: '1.1rem' }}>{tx.type === 'income' ? '↓' : tx.type === 'expense' ? '↑' : '⇄'}</span>
                 </div>
-                <div className="tx-info">
-                  <p className="tx-title">{tx.note || tx.category}</p>
-                  <p className="tx-meta">
+                <div className="tx-info" style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                  <p className="tx-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.note || tx.category}</p>
+                  <p className="tx-meta" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     <span className="badge" style={{ background: typeColor[tx.type] + '22', color: typeColor[tx.type], marginRight: 6, textTransform: 'capitalize' }}>
                       {tx.type === 'transfer' ? 'self transfer' : tx.type}
                     </span>
                     {tx.accountId?.name} · {fmtDate(tx.date)}
                   </p>
                 </div>
-                <span className="tx-amount" style={{ color: typeColor[tx.type] }}>
+                <span className="tx-amount" style={{ color: typeColor[tx.type], flexShrink: 0 }}>
                   {typeSign[tx.type]}{fmt(tx.amount)}
                 </span>
-                <button className="btn btn-icon btn-danger" style={{ marginLeft: 8 }} onClick={() => handleDelete(tx._id)} title="Delete">
+                <button className="btn btn-icon btn-danger" style={{ marginLeft: 8, flexShrink: 0 }} onClick={() => handleDelete(tx._id)} title="Delete">
                   <Trash2 size={14} />
                 </button>
               </div>
