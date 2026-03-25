@@ -149,8 +149,9 @@ const StyledSavingsCard = styled(motion.div)`
 
   .progress-row {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 16px;
+    gap: 10px 16px;
     width: 100%;
   }
 
@@ -160,9 +161,10 @@ const StyledSavingsCard = styled(motion.div)`
     font-size: 0.85rem;
     font-weight: 700;
     color: #fff;
-    min-width: 100px;
+    min-width: 120px;
     text-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
   }
 
   .pill.earned { background: #0EA5E9; }
@@ -170,7 +172,8 @@ const StyledSavingsCard = styled(motion.div)`
 
   .bar-wrapper {
     flex: 1;
-    height: 32px;
+    min-width: 60px;
+    height: 28px;
     background: var(--bg-base);
     border-radius: var(--r-full);
     overflow: hidden;
@@ -188,10 +191,51 @@ const StyledSavingsCard = styled(motion.div)`
 
   .row-amount {
     font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-2);
-    min-width: 100px;
-    text-align: right;
+    font-weight: 700;
+    color: var(--text-1);
+    white-space: nowrap;
+    margin-left: auto;
+  }
+
+  /* On mobile: pill + amount sit on one line, bar stretches full-width below */
+  @media (max-width: 600px) {
+    padding: 16px;
+    gap: 14px;
+
+    .savings-amount {
+      font-size: 2rem;
+    }
+
+    .progress-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 6px;
+    }
+
+    .progress-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .pill {
+      min-width: unset;
+      font-size: 0.78rem;
+      padding: 5px 14px;
+    }
+
+    .row-amount {
+      font-size: 0.9rem;
+      margin-left: 0;
+    }
+
+    .bar-wrapper {
+      width: 100%;
+      height: 20px;
+      flex: unset;
+      min-width: unset;
+    }
   }
 `;
 
@@ -213,19 +257,23 @@ const SavingsCard = ({ month, totalBalance, earned, spend, currencyFmt, delay })
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <Link to="/transactions?type=income" style={{ textDecoration: 'none' }} className="progress-row">
-          <div className="pill earned">Earnings</div>
+          <div className="progress-top">
+            <div className="pill earned">Earnings</div>
+            <span className="row-amount">{currencyFmt(earned)}</span>
+          </div>
           <div className="bar-wrapper">
             <div className="bar-fill earned" style={{ width: '100%', opacity: 0.2 }} />
           </div>
-          <span className="row-amount">{currencyFmt(earned)}</span>
         </Link>
 
         <Link to="/accounts" style={{ textDecoration: 'none' }} className="progress-row">
-          <div className="pill" style={{ background: 'var(--success)' }}>Available Balance</div>
+          <div className="progress-top">
+            <div className="pill" style={{ background: 'var(--success)' }}>Available Balance</div>
+            <span className="row-amount">{currencyFmt(totalBalance)}</span>
+          </div>
           <div className="bar-wrapper">
             <div className="bar-fill" style={{ width: `${balanceWidth}%`, background: 'var(--success)' }} />
           </div>
-          <span className="row-amount">{currencyFmt(totalBalance)}</span>
         </Link>
       </div>
     </StyledSavingsCard>
