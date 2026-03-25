@@ -40,7 +40,7 @@ const getTransactions = async (req, res) => {
 
   const total = await Transaction.countDocuments(filter);
   const transactions = await Transaction.find(filter)
-    .sort({ date: -1, createdAt: -1 })
+    .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
     .limit(parseInt(limit))
     .populate('accountId', 'name color icon')

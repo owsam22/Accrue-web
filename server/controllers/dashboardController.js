@@ -43,7 +43,7 @@ const getDashboard = async (req, res) => {
 
     // Last 5 transactions
     Transaction.find({ userId })
-      .sort({ date: -1, _id: -1 })
+      .sort({ createdAt: -1 })
       .limit(5)
       .populate('accountId', 'name color icon'),
 
