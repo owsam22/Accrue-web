@@ -100,7 +100,7 @@ const Sidebar = () => {
       <aside className={`sidebar ${mobileOpen ? 'sidebar-open' : ''}`}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '8px' }}>
           <NavLink to="/" style={{ textDecoration: 'none' }} className="sidebar-logo">
-            <div className="logo-icon"><TrendingUp size={20} /></div>
+            <div className="logo-icon"><img src="/Accrue-logo.svg" alt="Accrue" style={{ width: '100%', height: '100%', objectFit: 'contain' }} /></div>
             <div>
               <span className="logo-text">Accrue</span>
               <p style={{ fontSize: '0.62rem', color: 'var(--text-3)', fontWeight: 500, marginTop: 1, lineHeight: 1 }}>Your personal finance tracker</p>
@@ -194,9 +194,15 @@ const Sidebar = () => {
           width: 36px; height: 36px;
           background: var(--accent-dim);
           border: 1px solid rgba(99,102,241,0.3);
-          border-radius: var(--r-md);
+          border-radius: 8px;
           display: flex; align-items: center; justify-content: center;
           color: var(--accent-light);
+          overflow: hidden;
+        }
+        .logo-icon img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
         }
         .logo-text {
           font-size: 1.35rem; font-weight: 800;

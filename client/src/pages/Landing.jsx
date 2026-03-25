@@ -107,7 +107,8 @@ const Landing = () => {
     <LandingContainer>
       <Header>
         <Logo>
-          <TrendingUp /> Accrue
+          <img src="/Accrue-logo.svg" alt="Accrue logo" style={{ width: 28, height: 28 }} />
+          Accrue
         </Logo>
         <Link to="/login" className="btn btn-secondary">
           Sign In

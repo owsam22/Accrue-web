@@ -27,7 +27,7 @@ const Login = () => {
     <div className="login-page">
       <div className="login-card fade-up">
         <div className="login-logo">
-          <div className="login-logo-icon"><TrendingUp size={28} /></div>
+          <div className="login-logo-icon"><img src="/Accrue-logo.svg" alt="Accrue logo" style={{ width: 28, height: 28 }} /></div>
           <h1 className="login-title">Accrue</h1>
           <p className="login-tagline">Your finances, everywhere</p>
         </div>
