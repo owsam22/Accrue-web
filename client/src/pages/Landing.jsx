@@ -14,7 +14,7 @@ const LandingContainer = styled.div`
 `;
 
 const Header = styled.header`
-  padding: 24px 48px;
+  padding: 20px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;

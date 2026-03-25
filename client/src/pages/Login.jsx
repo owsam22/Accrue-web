@@ -39,7 +39,7 @@ const Login = () => {
       <div className="login-card fade-up">
         <div className="login-logo">
           <div className="login-logo-icon">
-            <img src="/Accrue-logo.svg" alt="Accrue logo" style={{ width: 32, height: 32 }} />
+            <img src="/Accrue-logo.svg" alt="Accrue logo"/>
           </div>
           <h1 className="login-title">Accrue</h1>
           <p className="login-tagline">Your finances, everywhere</p>
@@ -160,11 +160,11 @@ const Login = () => {
         .login-logo { display: flex; flex-direction: column; align-items: center; gap: 12px; }
         .login-logo-icon {
           width: 64px; height: 64px;
-          background: linear-gradient(135deg, var(--accent), #4338ca);
+          background: linear-gradient(135deg, var(--accent), #eeedffff);
           border-radius: var(--r-xl);
           display: flex; align-items: center; justify-content: center;
           color: #fff;
-          box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.4);
+          box-shadow: 0 8px 16px -4px rgba(24, 28, 255, 0.4);
           margin-bottom: 8px;
         }
         .login-title {
