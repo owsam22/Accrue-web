@@ -203,7 +203,7 @@ const StyledSavingsCard = styled(motion.div)`
     gap: 14px;
 
     .savings-amount {
-      font-size: 2rem;
+      font-size: 2.4rem;
     }
 
     .progress-row {
@@ -240,8 +240,12 @@ const StyledSavingsCard = styled(motion.div)`
 `;
 
 const SavingsCard = ({ month, totalBalance, earned, spend, currencyFmt, delay }) => {
-  // Available Balance is the overall total. We'll show it relative to earnings or just a full bar if > earnings.
-  const balanceWidth = Math.min((totalBalance / (earned || 1)) * 100, 100);
+  // Available Balance relative to earnings or just a full bar if > earnings.
+  const isNegative = totalBalance < 0;
+  const isLowBalance = totalBalance < (earned * 0.1) || isNegative;
+  
+  const balanceWidth = isNegative ? 0 : Math.min((totalBalance / (earned || 1)) * 100, 100);
+  const themeColor = isLowBalance ? 'var(--danger)' : 'var(--success)';
   
   return (
     <StyledSavingsCard
@@ -268,11 +272,15 @@ const SavingsCard = ({ month, totalBalance, earned, spend, currencyFmt, delay })
 
         <Link to="/accounts" style={{ textDecoration: 'none' }} className="progress-row">
           <div className="progress-top">
-            <div className="pill" style={{ background: 'var(--success)' }}>Available Balance</div>
-            <span className="row-amount">{currencyFmt(totalBalance)}</span>
+            <div className="pill" style={{ background: themeColor }}>
+              {isLowBalance ? 'Balance is Low' : 'Available Balance'}
+            </div>
+            <span className="row-amount" style={{ color: isLowBalance ? 'var(--danger)' : 'var(--text-1)' }}>
+              {currencyFmt(totalBalance)}
+            </span>
           </div>
           <div className="bar-wrapper">
-            <div className="bar-fill" style={{ width: `${balanceWidth}%`, background: 'var(--success)' }} />
+            <div className="bar-fill" style={{ width: `${balanceWidth}%`, background: themeColor }} />
           </div>
         </Link>
       </div>
@@ -418,20 +426,46 @@ const Dashboard = () => {
               </div>
             ) : (
               <div className="tx-list">
-                {d.recentTransactions.map((tx) => (
-                  <div key={tx._id} className="tx-item">
-                    <div className="tx-icon" style={{ background: typeColor[tx.type] + '22' }}>
-                      {tx.type === 'income' ? '↓' : tx.type === 'expense' ? '↑' : '⇄'}
+                {d.recentTransactions.map((tx, idx) => {
+                  // Calculate "balance after" for recent transactions
+                  const getBalanceAfter = () => {
+                    const account = d.accounts?.find(a => a._id === tx.accountId?._id || a._id === tx.accountId);
+                    if (!account) return null;
+                    let balance = account.balance;
+                    // Note: This logic assumes recentTransactions are the MOST recent ones
+                    for (let i = 0; i < idx; i++) {
+                      const earlierTx = d.recentTransactions[i];
+                      if (earlierTx.accountId?._id === account._id || earlierTx.accountId === account._id) {
+                        const delta = { income: earlierTx.amount, expense: -earlierTx.amount, transfer: -earlierTx.amount }[earlierTx.type] || 0;
+                        balance -= delta;
+                      }
+                    }
+                    return balance;
+                  };
+                  const balanceAfter = getBalanceAfter();
+
+                  return (
+                    <div key={tx._id} className="tx-item">
+                      <div className="tx-icon" style={{ background: typeColor[tx.type] + '22' }}>
+                        {tx.type === 'income' ? '↓' : tx.type === 'expense' ? '↑' : '⇄'}
+                      </div>
+                      <div className="tx-info" style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
+                        <p className="tx-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.note || tx.category}</p>
+                        <p className="tx-meta" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {tx.accountId?.name} · {fmtDate(tx.date)}
+                        </p>
+                        {balanceAfter !== null && (
+                          <p style={{ fontSize: '0.7rem', color: 'var(--text-3)', fontStyle: 'italic' }}>
+                            Bal: {fmt(balanceAfter)}
+                          </p>
+                        )}
+                      </div>
+                      <span className="tx-amount" style={{ color: typeColor[tx.type] }}>
+                        {typeSign[tx.type]}{fmt(tx.amount)}
+                      </span>
                     </div>
-                    <div className="tx-info" style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
-                      <p className="tx-title" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.note || tx.category}</p>
-                      <p className="tx-meta" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.accountId?.name} · {fmtDate(tx.date)}</p>
-                    </div>
-                    <span className="tx-amount" style={{ color: typeColor[tx.type] }}>
-                      {typeSign[tx.type]}{fmt(tx.amount)}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

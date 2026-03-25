@@ -605,8 +605,8 @@ a:hover { color: var(--accent); }
     flex-direction: column;
     gap: 20px;
   }
-  .dashboard-chart-card { order: 1; }
-  .dashboard-grid > div:first-child { order: 2; }
+  .dashboard-grid > div:first-child { order: 1; }
+  .dashboard-chart-card { order: 2; }
   .dashboard-grid > div:last-child { order: 3; }
 }
 

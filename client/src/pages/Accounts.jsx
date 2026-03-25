@@ -114,7 +114,14 @@ const Accounts = () => {
                   </div>
                 </div>
                 <div>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-3)', marginBottom: 4 }}>BALANCE</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 4 }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--text-3)' }}>BALANCE</p>
+                    {acc.balance < 1000 && !acc.isArchived && (
+                      <span style={{ fontSize: '0.65rem', color: 'var(--danger)', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 2 }}>
+                        ⚠️ LOW BALANCE
+                      </span>
+                    )}
+                  </div>
                   <p className="account-balance" style={{ color }}>{fmt(acc.balance)}</p>
                   <p style={{ fontSize: '0.75rem', color: 'var(--text-3)' }}>{acc.currency}</p>
                 </div>
