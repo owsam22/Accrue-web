@@ -78,7 +78,7 @@ const Bills = () => {
   if (isLoading && !bills?.length) return <Layout><div className="loading-overlay"><Loader /><p style={{ marginTop: 12, color: 'var(--text-3)', fontWeight: 600 }}>Connecting to server...</p></div></Layout>;
 
   const unpaid = (bills || []).filter(b => !b.isPaid);
-  const paid   = (bills || []).filter(b =>  b.isPaid);
+  const paid = (bills || []).filter(b => b.isPaid);
 
   return (
     <Layout>
@@ -91,7 +91,7 @@ const Bills = () => {
           <p className="page-subtitle">{unpaid.length} unpaid · {paid.length} paid</p>
         </div>
         <button className="btn btn-primary" onClick={() => { setForm(EMPTY_FORM); setModal(true); }}>
-          <Plus size={16}/> Add Bill
+          <Plus size={16} /> Add Bill
         </button>
       </div>
 
@@ -101,7 +101,7 @@ const Bills = () => {
           <h3>No bills yet</h3>
           <p>Track recurring expenses and due dates.</p>
           <button className="btn btn-primary" style={{ marginTop: 8 }} onClick={() => { setForm(EMPTY_FORM); setModal(true); }}>
-            <Plus size={16}/> Add Bill
+            <Plus size={16} /> Add Bill
           </button>
         </div>
       ) : (
@@ -158,7 +158,7 @@ const Bills = () => {
                       </button>
                     )}
                     <button className="btn btn-icon btn-danger" onClick={() => handleDelete(bill._id)} title="Delete">
-                      <Trash2 size={14}/>
+                      <Trash2 size={14} />
                     </button>
                   </div>
                 </div>
@@ -173,23 +173,23 @@ const Bills = () => {
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div className="form-group">
             <label className="form-label">Bill Name *</label>
-            <input className="form-input" required value={form.name} onChange={e => setForm({...form, name: e.target.value})} placeholder="e.g. Netflix"/>
+            <input className="form-input" required value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="e.g. Netflix" />
           </div>
           <div className="form-grid">
             <div className="form-group">
               <label className="form-label">Amount *</label>
-              <input className="form-input" type="number" required min="0.01" step="0.01" value={form.amount} onChange={e => setForm({...form, amount: e.target.value})}/>
+              <input className="form-input" type="number" required min="0.01" step="0.01" value={form.amount} onChange={e => setForm({ ...form, amount: e.target.value })} />
             </div>
             <div className="form-group">
               <label className="form-label">Due Date *</label>
-              <input className="form-input" type="date" required value={form.dueDate} onChange={e => setForm({...form, dueDate: e.target.value})}/>
+              <input className="form-input" type="date" required value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} />
             </div>
           </div>
           <div className="form-group">
             <label className="form-label">Default Account</label>
-            <select className="form-select" value={form.accountId} onChange={e => setForm({...form, accountId: e.target.value})}>
+            <select className="form-select" value={form.accountId} onChange={e => setForm({ ...form, accountId: e.target.value })}>
               <option value="">Select account</option>
-              {(accounts||[]).map(a => <option key={a._id} value={a._id}>{a.name}</option>)}
+              {(accounts || []).map(a => <option key={a._id} value={a._id}>{a.name}</option>)}
             </select>
           </div>
 
@@ -204,7 +204,7 @@ const Bills = () => {
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-3)' }}>Mark this as a recurring monthly bill</p>
               </div>
             </div>
-            <div className={`toggle-switch ${form.isRecurring ? 'on' : ''}`} onClick={() => setForm({...form, isRecurring: !form.isRecurring})}>
+            <div className={`toggle-switch ${form.isRecurring ? 'on' : ''}`} onClick={() => setForm({ ...form, isRecurring: !form.isRecurring })}>
               <div className="toggle-knob" />
             </div>
           </label>
@@ -222,7 +222,7 @@ const Bills = () => {
           <p style={{ color: 'var(--text-2)' }}>Paying <strong style={{ color: 'var(--text-1)' }}>{fmt(payModal?.amount)}</strong> from:</p>
           <select className="form-select" value={payAccountId} onChange={e => setPayAccountId(e.target.value)}>
             <option value="">Select account</option>
-            {(accounts||[]).map(a => <option key={a._id} value={a._id}>{a.name}</option>)}
+            {(accounts || []).map(a => <option key={a._id} value={a._id}>{a.name}</option>)}
           </select>
           <p style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>This will create an expense transaction and update the account balance.</p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>

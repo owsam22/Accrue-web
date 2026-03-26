@@ -36,6 +36,10 @@ const accountSchema = new mongoose.Schema(
       type: String,
       default: 'other',
     },
+    specifiedCurrency: {
+      type: String,
+      default: 'other',
+    },
     color: {
       type: String,
       default: '#6366F1',

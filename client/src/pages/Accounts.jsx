@@ -37,15 +37,15 @@ const Accounts = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      const payload = { 
-        name: form.name, 
-        type: form.type, 
+      const payload = {
+        name: form.name,
+        type: form.type,
         specifiedType: form.type === 'other' ? form.specifiedType : 'other',
-        currency: form.currency, 
+        currency: form.currency,
         specifiedCurrency: form.currency === 'Other' ? form.specifiedCurrency : 'other',
-        color: form.color || typeColors[form.type] 
+        color: form.color || typeColors[form.type]
       };
-      
+
       if (editing) {
         await updateAccount(editing._id, payload);
       } else {

@@ -19,7 +19,7 @@ const fmtDate = (d) =>
   new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 
 const typeColor = { income: 'var(--success)', expense: 'var(--danger)', transfer: 'var(--accent-light)' };
-const typeSign  = { income: '+', expense: '−', transfer: '' };
+const typeSign = { income: '+', expense: '−', transfer: '' };
 const COLORS = ['#4F46E5', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4'];
 
 const getGreeting = () => {
@@ -243,10 +243,10 @@ const SavingsCard = ({ month, totalBalance, earned, spend, currencyFmt, delay })
   // Available Balance relative to earnings or just a full bar if > earnings.
   const isNegative = totalBalance < 0;
   const isLowBalance = totalBalance < (earned * 0.1) || isNegative;
-  
+
   const balanceWidth = isNegative ? 0 : Math.min((totalBalance / (earned || 1)) * 100, 100);
   const themeColor = isLowBalance ? 'var(--danger)' : 'var(--success)';
-  
+
   return (
     <StyledSavingsCard
       initial={{ opacity: 0, scale: 0.95 }}
@@ -295,15 +295,19 @@ const StatCard = ({ label, value, Icon, iconBg, color, delay, to }) => (
       $themeColor={color}
       $iconBg={iconBg}
       initial={{ opacity: 0, y: 20 }}
+      whileHover={{ y: -4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.1, duration: 0.4 }}
       style={{ cursor: 'pointer', height: '100%' }}
     >
       <span className="label">{label}</span>
       <span className="value" style={{ color }}>{value}</span>
-      <div className="icon-wrapper">
+      <motion.div 
+        className="icon-wrapper"
+        whileHover={{ scale: 1.1, rotate: 5 }}
+      >
         <Icon size={20} />
-      </div>
+      </motion.div>
     </StyledStatCard>
   </Link>
 );
@@ -360,11 +364,11 @@ const Dashboard = () => {
 
       {/* Stats */}
       <div className="stat-grid" style={{ gridTemplateColumns: '1fr' }}>
-        <SavingsCard 
-          month={d.month} 
+        <SavingsCard
+          month={d.month}
           totalBalance={d.totalBalance}
-          earned={d.monthlyIncome} 
-          spend={d.monthlyExpense} 
+          earned={d.monthlyIncome}
+          spend={d.monthlyExpense}
           currencyFmt={fmt}
           delay={1}
         />
@@ -484,21 +488,24 @@ const Dashboard = () => {
                   <PieChart>
                     <Pie
                       data={d.categoryData}
-                      innerRadius={40}
-                      outerRadius={80}
+                      innerRadius={60}
+                      outerRadius={85}
                       paddingAngle={5}
                       dataKey="value"
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                       fill="#8884d8"
                     >
                       {d.categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
                       ))}
                     </Pie>
                     <Tooltip 
                       formatter={(val) => fmt(val)}
-                      contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: '0.75rem' }}
+                      contentStyle={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-md)', fontSize: '0.75rem', boxShadow: 'var(--shadow-lg)' }}
                     />
+                    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
+                       <tspan x="50%" dy="-0.5em" style={{ fontSize: '0.65rem', fontWeight: 600, fill: 'var(--text-3)', textTransform: 'uppercase' }}>Total</tspan>
+                       <tspan x="50%" dy="1.4em" style={{ fontSize: '1.1rem', fontWeight: 800, fill: 'var(--text-1)' }}>{fmt(d.monthlyExpense)}</tspan>
+                    </text>
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
