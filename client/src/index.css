@@ -695,6 +695,27 @@ a:hover {
   font-weight: 500;
 }
 
+.saving-overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--bg-surface);
+  opacity: 0.8;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: inherit;
+  animation: fadeIn 0.2s ease;
+}
+
+[data-theme='dark'] .saving-overlay {
+  background: var(--bg-surface);
+}
+
 /* ── Sync indicator ─────────────────────────────────────────────────────────── */
 .sync-dot {
   width: 7px;
