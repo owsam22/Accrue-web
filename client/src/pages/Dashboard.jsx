@@ -393,9 +393,26 @@ const Dashboard = () => {
     e.preventDefault(); setSavingTx(true);
     try {
       const finalCategory = (txForm.category === 'Other' && txForm.specifiedCategory.trim()) ? txForm.specifiedCategory : txForm.category;
-      await createTransaction({ ...txForm, category: finalCategory, amount: parseFloat(txForm.amount) });
+      
+      const savePromise = createTransaction({ ...txForm, category: finalCategory, amount: parseFloat(txForm.amount) });
+      const minDelay = new Promise(resolve => setTimeout(resolve, 1200));
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 5000));
+
+      // Ensure loader is visible for at least 1.2s, but timeout after 5s
+      await Promise.all([
+        Promise.race([savePromise, timeout]),
+        minDelay
+      ]);
+
       setTxForm(EMPTY_TX_FORM); refresh();
-    } catch (err) { console.error(err); } finally { setSavingTx(false); }
+    } catch (err) { 
+      console.error(err); 
+      if (err.message === 'TIMEOUT') {
+        alert('Saving is taking longer than expected. Please try again later.');
+      } else {
+        alert('Failed to add transaction. Please try again.');
+      }
+    } finally { setSavingTx(false); }
   };
 
   if (isLoading && !data) return <Layout><div className="loading-overlay"><Loader /><p style={{ marginTop: 12, color: 'var(--text-3)', fontWeight: 600 }}>Connecting to server...</p></div></Layout>;
@@ -446,7 +463,13 @@ const Dashboard = () => {
       <div className="dashboard-grid">
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Quick Add Transaction — desktop only */}
-          <div className="card fade-up desktop-only">
+          <div className="card fade-up desktop-only" style={{ position: 'relative' }}>
+            {savingTx && (
+              <div className="saving-overlay">
+                <Loader small />
+                <p style={{ fontWeight: 700, color: 'var(--text-2)', fontSize: '0.9rem', marginTop: -10 }}>Processing...</p>
+              </div>
+            )}
             <div className="section-header" style={{ marginBottom: 12 }}>
               <span className="section-title">Add Transaction</span>
             </div>
@@ -481,7 +504,7 @@ const Dashboard = () => {
                 <input className="form-input" style={{ flex: 1 }} value={txForm.note} onChange={(e) => setTxForm({ ...txForm, note: e.target.value })} placeholder="Note" />
               </div>
               <button type="submit" className="btn btn-primary" style={{ width: '100%', justifyContent: 'center' }} disabled={savingTx}>
-                {savingTx ? 'Saving…' : 'Add'}
+                Add Transaction
               </button>
             </form>
           </div>

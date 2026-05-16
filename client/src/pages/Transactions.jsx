@@ -79,11 +79,28 @@ const Transactions = () => {
     setSaving(true);
     try {
       const finalCategory = (form.category === 'Other' && form.specifiedCategory.trim() !== '') ? form.specifiedCategory : form.category;
-      await createTransaction({ ...form, category: finalCategory, amount: parseFloat(form.amount) });
+      
+      const savePromise = createTransaction({ ...form, category: finalCategory, amount: parseFloat(form.amount) });
+      const minDelay = new Promise(resolve => setTimeout(resolve, 1200));
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 5000));
+
+      // Ensure loader is visible for at least 1.2s, but timeout after 5s
+      await Promise.all([
+        Promise.race([savePromise, timeout]),
+        minDelay
+      ]);
+
       setModal(false);
       setForm(EMPTY_FORM);
       refresh();
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err); 
+      if (err.message === 'TIMEOUT') {
+        alert('Saving is taking longer than expected. Please try again later.');
+      } else {
+        alert('Failed to save transaction. Please try again.');
+      }
+    }
     finally { setSaving(false); }
   };
 
@@ -288,7 +305,7 @@ const Transactions = () => {
         )}
       </Modal>
 
-      <Modal isOpen={modal} onClose={() => setModal(false)} title="Add Transaction">
+      <Modal isOpen={modal} onClose={() => setModal(false)} title="Add Transaction" isLoading={saving}>
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {/* Type toggle */}
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -350,7 +367,7 @@ const Transactions = () => {
 
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
             <button type="button" className="btn btn-secondary" onClick={() => setModal(false)}>Cancel</button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving…' : 'Add Transaction'}</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>Add Transaction</button>
           </div>
         </form>
       </Modal>

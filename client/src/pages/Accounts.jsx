@@ -46,14 +46,29 @@ const Accounts = () => {
         color: form.color || typeColors[form.type]
       };
 
-      if (editing) {
-        await updateAccount(editing._id, payload);
-      } else {
-        await createAccount({ ...payload, balance: parseFloat(form.balance) || 0 });
-      }
+      const savePromise = editing 
+        ? updateAccount(editing._id, payload)
+        : createAccount({ ...payload, balance: parseFloat(form.balance) || 0 });
+      
+      const minDelay = new Promise(resolve => setTimeout(resolve, 1200));
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 5000));
+
+      // Ensure loader is visible for at least 1.2s, but timeout after 5s
+      await Promise.all([
+        Promise.race([savePromise, timeout]),
+        minDelay
+      ]);
+
       setModal(false);
       refresh();
-    } catch (e) { console.error(e); }
+    } catch (err) { 
+      console.error(err); 
+      if (err.message === 'TIMEOUT') {
+        alert('Saving is taking longer than expected. Please try again later.');
+      } else {
+        alert('Failed to save account. Please try again.');
+      }
+    }
     finally { setSaving(false); }
   };
 
@@ -131,7 +146,7 @@ const Accounts = () => {
         </div>
       )}
 
-      <Modal isOpen={modal} onClose={() => setModal(false)} title={editing ? 'Edit Account' : 'Add Account'}>
+      <Modal isOpen={modal} onClose={() => setModal(false)} title={editing ? 'Edit Account' : 'Add Account'} isLoading={saving}>
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           <div className="form-group">
             <label className="form-label">Account Name *</label>
@@ -174,7 +189,7 @@ const Accounts = () => {
           )}
           <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: 6 }}>
             <button type="button" className="btn btn-secondary" onClick={() => setModal(false)}>Cancel</button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving…' : editing ? 'Update' : 'Create'}</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>{editing ? 'Update Account' : 'Create Account'}</button>
           </div>
         </form>
       </Modal>

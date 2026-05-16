@@ -39,21 +39,57 @@ const Bills = () => {
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true);
     try {
-      await createBill({
+      const savePromise = createBill({
         ...form,
         amount: parseFloat(form.amount),
         isRecurring: form.isRecurring || false,
         recurringPeriod: form.isRecurring ? 'monthly' : null,
       });
+
+      const minDelay = new Promise(resolve => setTimeout(resolve, 1200));
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 5000));
+
+      // Ensure loader is visible for at least 1.2s, but timeout after 5s
+      await Promise.all([
+        Promise.race([savePromise, timeout]),
+        minDelay
+      ]);
+
       setModal(false); refresh();
     }
-    catch (err) { console.error(err); } finally { setSaving(false); }
+    catch (err) { 
+      console.error(err); 
+      if (err.message === 'TIMEOUT') {
+        alert('Saving is taking longer than expected. Please try again later.');
+      } else {
+        alert('Failed to add bill. Please try again.');
+      }
+    } finally { setSaving(false); }
   };
 
   const handlePay = async () => {
     if (!payAccountId) return; setSaving(true);
-    try { await payBill(payModal._id, { accountId: payAccountId }); setPayModal(null); refresh(); }
-    catch (err) { console.error(err); } finally { setSaving(false); }
+    try { 
+      const payPromise = payBill(payModal._id, { accountId: payAccountId });
+      const minDelay = new Promise(resolve => setTimeout(resolve, 1200));
+      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('TIMEOUT')), 5000));
+
+      // Ensure loader is visible for at least 1.2s, but timeout after 5s
+      await Promise.all([
+        Promise.race([payPromise, timeout]),
+        minDelay
+      ]);
+      
+      setPayModal(null); refresh(); 
+    }
+    catch (err) { 
+      console.error(err); 
+      if (err.message === 'TIMEOUT') {
+        alert('Payment is taking longer than expected. Please try again later.');
+      } else {
+        alert('Failed to process payment. Please try again.');
+      }
+    } finally { setSaving(false); }
   };
 
   const handleDelete = async (id) => {
@@ -169,7 +205,7 @@ const Bills = () => {
       )}
 
       {/* ── Add Bill Modal ── */}
-      <Modal isOpen={modal} onClose={() => setModal(false)} title="Add Bill">
+      <Modal isOpen={modal} onClose={() => setModal(false)} title="Add Bill" isLoading={saving}>
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <div className="form-group">
             <label className="form-label">Bill Name *</label>
@@ -211,13 +247,13 @@ const Bills = () => {
 
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 6 }}>
             <button type="button" className="btn btn-secondary" onClick={() => setModal(false)}>Cancel</button>
-            <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving…' : 'Add Bill'}</button>
+            <button type="submit" className="btn btn-primary" disabled={saving}>Add Bill</button>
           </div>
         </form>
       </Modal>
 
       {/* ── Pay Bill Modal ── */}
-      <Modal isOpen={!!payModal} onClose={() => setPayModal(null)} title={`Pay — ${payModal?.name}`} size="sm">
+      <Modal isOpen={!!payModal} onClose={() => setPayModal(null)} title={`Pay — ${payModal?.name}`} size="sm" isLoading={saving}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <p style={{ color: 'var(--text-2)' }}>Paying <strong style={{ color: 'var(--text-1)' }}>{fmt(payModal?.amount)}</strong> from:</p>
           <select className="form-select" value={payAccountId} onChange={e => setPayAccountId(e.target.value)}>
@@ -227,7 +263,7 @@ const Bills = () => {
           <p style={{ fontSize: '0.78rem', color: 'var(--text-3)' }}>This will create an expense transaction and update the account balance.</p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
             <button className="btn btn-secondary" onClick={() => setPayModal(null)}>Cancel</button>
-            <button className="btn btn-success" disabled={!payAccountId || saving} onClick={handlePay}>{saving ? 'Processing…' : 'Confirm Payment'}</button>
+            <button className="btn btn-success" disabled={!payAccountId || saving} onClick={handlePay}>Confirm Payment</button>
           </div>
         </div>
       </Modal>
