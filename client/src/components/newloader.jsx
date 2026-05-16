@@ -1,9 +1,9 @@
 
 import styled from 'styled-components';
 
-const Loader = () => {
+const Loader = ({ small }) => {
   return (
-    <StyledWrapper>
+    <StyledWrapper style={small ? { transform: 'scale(0.6)', margin: '-10px 0' } : {}}>
       <div className="wallet-loader">
         <div className="wallet-back" />
         <div className="bill bill-1" />
@@ -11,7 +11,7 @@ const Loader = () => {
         <div className="bill bill-3" />
         <div className="wallet-front">
           <div className="text">
-            Loading<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span>
+            {small ? 'Saving' : 'Loading'}<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span>
           </div>
         </div>
       </div>

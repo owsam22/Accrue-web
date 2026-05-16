@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
+import Loader from './newloader';
 
-const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
+const Modal = ({ isOpen, onClose, title, children, size = 'md', isLoading = false }) => {
   // Close on Escape key
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose(); };
@@ -24,7 +25,15 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
           <h3 className="modal-title">{title}</h3>
           <button className="modal-close" onClick={onClose} aria-label="Close"><X size={18} /></button>
         </div>
-        <div className="modal-body">{children}</div>
+        <div className="modal-body">
+          {isLoading && (
+            <div className="saving-overlay">
+              <Loader small />
+              <p style={{ fontWeight: 700, color: 'var(--text-2)', fontSize: '0.9rem', marginTop: -10 }}>Processing...</p>
+            </div>
+          )}
+          {children}
+        </div>
       </div>
 
       <style>{`
@@ -63,7 +72,7 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
           transition: all var(--transition);
         }
         .modal-close:hover { background: var(--danger-dim); color: var(--danger); border-color: transparent; }
-        .modal-body { padding: 20px 24px 24px; }
+        .modal-body { padding: 20px 24px 24px; position: relative; }
       `}</style>
     </div>
   );
