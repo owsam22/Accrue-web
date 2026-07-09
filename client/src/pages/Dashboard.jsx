@@ -315,8 +315,8 @@ const StatCard = ({ label, value, Icon, iconBg, color, delay, to }) => (
 
 const EMPTY_TX_FORM = { accountId: '', toAccountId: '', type: 'expense', amount: '', category: 'Food', specifiedCategory: '', note: '', date: new Date().toISOString().slice(0, 10) };
 
-const EXPENSE_CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Health', 'Education', 'Bills', 'Rent', 'Other'];
-const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Investment', 'Gift', 'Refund', 'Other'];
+const EXPENSE_CATEGORIES = ['Food', 'Diet' ,'Transport', 'Shopping', 'Gym', 'Education', 'Bills', 'Rent', 'Other'];
+const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Pocket Money', 'Gift', 'Refund', 'Other'];
 const CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES]; // For fallback or searching
 
 const StatSideStack = styled.div`
