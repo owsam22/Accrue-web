@@ -15,7 +15,7 @@ const fmt = (n) =>
 
 const fmtDate = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-const EXPENSE_CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Health', 'Education', 'Bills', 'Rent', 'Other'];
+const EXPENSE_CATEGORIES = ['Food', 'Diet' ,'Transport', 'Shopping', 'Gym', 'Education', 'Bills', 'Rent', 'Other'];
 const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Pocket Money', 'Gift', 'Refund', 'Other'];
 const CATEGORIES = [...EXPENSE_CATEGORIES, ...INCOME_CATEGORIES];
 const typeColor = { income: 'var(--success)', expense: 'var(--danger)', transfer: 'var(--accent-light)' };
