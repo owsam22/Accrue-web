@@ -71,7 +71,7 @@ const FabButton = styled(motion.button)`
 `;
 
 /* ── Categories ─────────────────────────────────────────────────────── */
-const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Refund', 'Gift', 'Other'];
+const INCOME_CATEGORIES = ['Salary', 'Freelance','pocket money', 'Refund', 'Gift', 'Other'];
 const EXPENSE_CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Travel', 'Education', 'Other'];
 const EMPTY_FORM = { accountId: '', toAccountId: '', type: 'expense', amount: '', category: 'Food', specifiedCategory: '', note: '', date: new Date().toISOString().slice(0, 10) };
 
